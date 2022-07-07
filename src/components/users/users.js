@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useGetData } from "../../services/ServerRequest";
-import BasicTable from "../Table/Table";
+import TableView from "../Table/Table";
 import { getAllDaysInMonth, getUsersTableData } from "./users.utils";
 
 const UsersList = () => {
@@ -12,10 +12,10 @@ const UsersList = () => {
     return checkDate ? getAllDaysInMonth(checkDate.getFullYear(), checkDate.getMonth()) : [...Array(30).keys(),30].slice(1);
   }, [tableData]);
 
-  console.log(daysInMonth);
+  console.log(tableData);
 
   return (
-    <BasicTable daysInMonth={daysInMonth}/>
+    <TableView daysInMonth={daysInMonth}/>
   )
 };
 

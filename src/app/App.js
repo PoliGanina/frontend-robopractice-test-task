@@ -1,5 +1,4 @@
 import { QueryClientProvider, QueryClient } from "react-query";
-import BasicTable from "../components/Table/Table";
 import UsersList from "../components/users/users";
 
 const App = () => {
@@ -15,7 +14,6 @@ const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <UsersList/>
-            <BasicTable/>
         </QueryClientProvider>
     )
 }

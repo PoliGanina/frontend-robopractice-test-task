@@ -20,6 +20,14 @@ export const getUsersTableData = (data) =>
     };
   });
 
+export const getUsersScreenTime = (data) => {
+    data.map(({userName, days}) => {
+        return {
+            userName: userName,
+        }
+    })
+}
+
 export const getAllDaysInMonth = (year, month) => {
   const date = new Date(year, month, 1);
 
@@ -34,8 +42,8 @@ export const getAllDaysInMonth = (year, month) => {
   return days;
 };
 
-export const getTableColumns = (data) => [
+export const getTableColumns = (daysInMonth) => [
     {Header: 'User', id: 'userName', accessor: ({userName}) => userName},
-    ...data.map(({days}, i) => ({Header: 'User', id: 'userName', accessor: ({userName}) => userName}))
+    ...daysInMonth.map((day) => ({Header: day, id: 'userName', accessor: ({userName}) => userName}))
 
     ]

@@ -7,7 +7,9 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
 
-const BasicTable = ({daysInMonth}) => {
+const TableView = ({daysInMonth}) => {
+
+
 
   return (
     <TableContainer component={Paper}>
@@ -15,7 +17,13 @@ const BasicTable = ({daysInMonth}) => {
         <TableHead>
           <TableRow>
             <TableCell>UserName</TableCell>
-          
+          {
+            daysInMonth.map((day,i) => {
+              return (
+                <TableCell align="right" key={i}>{day}</TableCell>
+              )
+            })
+          }
             <TableCell align="right">Calories</TableCell>
             <TableCell align="right">Fat&nbsp;(g)</TableCell>
             <TableCell align="right">Carbs&nbsp;(g)</TableCell>
@@ -43,4 +51,4 @@ const BasicTable = ({daysInMonth}) => {
   );
 }
 
-export default BasicTable;
+export default TableView;
