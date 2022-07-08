@@ -8,25 +8,39 @@ export const getUsersTableData = (data) =>
       days: days.map((info) => {
         const startDate = parse(info.Start, "HH-mm", new Date());
         const endDate = parse(info.End, "HH-mm", new Date());
-
         const differenceMinutes = differenceInMinutes(endDate, startDate);
+        const screenTimeDaily = getFormatedTime(differenceMinutes);
+        const dayOfMonth = new Date(info.Date).getDate();
 
-        const durationHours = Math.floor(differenceMinutes / 60);
-        const durationMinutes = differenceMinutes % 60;
-        const screenTimeDaily = `${durationHours}:${durationMinutes}`;
-
-        return { date: info.Date, differenceMinutes, screenTimeDaily };
+        return { date: dayOfMonth, differenceMinutes, screenTimeDaily };
       }),
     };
   });
 
-export const getUsersScreenTime = (data) => {
-    data.map(({userName, days}) => {
-        return {
-            userName: userName,
-        }
-    })
-}
+const getFormatedTime = (differenceMinutes) => {
+  const durationHours = Math.floor(differenceMinutes / 60);
+  const durationMinutes = differenceMinutes % 60;
+
+  return `${durationHours}:${durationMinutes}`;
+};
+
+export const getDataWithAvailiability = (tableData, daysInMonth) =>
+  tableData.map(({ days, ...rest }) => {
+    const totalScreenTime = days.reduceRight(
+      (acc, date) => acc + date.differenceMinutes,
+      0
+    );
+    const arrScreenTime = daysInMonth.map((day) => {
+      const relevantDay = days.find((item) => item.date === day);
+      return relevantDay ? relevantDay.screenTimeDaily : 0;
+    });
+
+    return {
+      days: arrScreenTime,
+      ...rest,
+      totalScreenTime: getFormatedTime(totalScreenTime),
+    };
+  });
 
 export const getAllDaysInMonth = (year, month) => {
   const date = new Date(year, month, 1);
@@ -41,9 +55,3 @@ export const getAllDaysInMonth = (year, month) => {
 
   return days;
 };
-
-export const getTableColumns = (daysInMonth) => [
-    {Header: 'User', id: 'userName', accessor: ({userName}) => userName},
-    ...daysInMonth.map((day) => ({Header: day, id: 'userName', accessor: ({userName}) => userName}))
-
-    ]
