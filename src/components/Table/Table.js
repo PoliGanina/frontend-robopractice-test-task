@@ -6,8 +6,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-const TableView = ({ daysInMonth, tableData, isFetching }) => {
- console.log(tableData)
+const TableView = ({ daysInMonth, tableContent, isFetching }) => {
+  console.log(tableContent);
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -21,22 +21,22 @@ const TableView = ({ daysInMonth, tableData, isFetching }) => {
                 </TableCell>
               );
             })}
+            <TableCell>TOTAL (hh:mm)</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {
-            tableData.map((userData) => (
+            tableContent.map((userData) => (
             <TableRow key={userData.id}>
               <TableCell component="th" scope="row">
                 {userData.userName}
               </TableCell>
-                {userData.days.map((day, daysInMonth, i) =>
-                day[i] === userData.days[i].data ? 
-                (<TableCell align="right">
-                    {userData.days[i].screenTimeDaily}
-                  </TableCell>) : 
-                (<TableCell align="right">0</TableCell>)
+                {userData.days.map((day,i) =>
+                <TableCell align="right">{userData.days[i]}</TableCell>
               )}
+              <TableCell component="th" scope="row">
+                {userData.totalScreenTime}
+              </TableCell>
             </TableRow>
           ))
           }

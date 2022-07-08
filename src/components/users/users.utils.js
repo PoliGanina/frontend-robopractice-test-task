@@ -20,7 +20,6 @@ export const getUsersTableData = (data) =>
 const getFormatedTime = (differenceMinutes) => {
   const durationHours = Math.floor(differenceMinutes / 60);
   const durationMinutes = differenceMinutes % 60;
-
   return `${durationHours}:${durationMinutes}`;
 };
 

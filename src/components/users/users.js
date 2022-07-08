@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import { useGetData } from "../../services/ServerRequest";
 import TableView from "../Table/Table";
-import { getAllDaysInMonth, getDataWithAvailiability, getUsersTableData } from "./users.utils";
+import Spinner from "../Spinner/Spinner";
+import {
+  getAllDaysInMonth,
+  getDataWithAvailiability,
+  getUsersTableData,
+} from "./users.utils";
 
 const UsersList = () => {
   const { data = [], isFetching } = useGetData();
@@ -15,16 +20,23 @@ const UsersList = () => {
       : [...Array(30).keys(), 30].slice(1);
   }, [tableData]);
 
-  const tableDataWithAvailiability = isFetching ? console.log('isFetching') : getDataWithAvailiability(tableData, daysInMonth);
-  console.log(tableDataWithAvailiability);
-  return null;
-  
-  return (
+  const tableContent = isFetching
+    ? console.log("isFetching")
+    : getDataWithAvailiability(tableData, daysInMonth);
+
+  const spinner = isFetching ? <Spinner /> : null;
+  const content = isFetching ? null : (
     <TableView
       daysInMonth={daysInMonth}
-      tableData={tableData}
+      tableContent={tableContent}
       isFetching={isFetching}
     />
+  );
+  return (
+    <>
+      {spinner}
+      {content}
+    </>
   );
 };
 
