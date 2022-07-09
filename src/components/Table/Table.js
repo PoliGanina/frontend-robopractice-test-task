@@ -12,6 +12,7 @@ import {TablePaginationActions} from "./Table.utils";
 
 
 const TableView = ({ daysInMonth, tableContent }) => {
+    
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
 
@@ -30,7 +31,7 @@ const TableView = ({ daysInMonth, tableContent }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table stickyHeader sx={{ minWidth: 650 }} aria-label="table">
+      <Table sx={{ minWidth: 650 }} aria-label="table">
         <TableHead>
           <TableRow>
             <TableCell>UserName</TableCell>
