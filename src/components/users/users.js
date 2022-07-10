@@ -11,7 +11,6 @@ import {
 import SearchBar from "../SearchBar/SearchBar";
 
 const UsersList = () => {
-  const [ searchTerm, setSearchTerm ] = useState('');
 
   const { data = [], isFetching } = useGetData();
   const tableData = useMemo(() => getUsersTableData(data), [data]);
@@ -28,30 +27,18 @@ const UsersList = () => {
     ? console.log("isFetching")
     : getDataWithAvailiability(tableData, daysInMonth);
 
-  const onUpdateSearch = (searchTerm) => setSearchTerm(searchTerm);
-
-  const searchEmp = (items, term) => {
-    if (term.length === 0) {
-        return tableContent;
-    }
-    return items.filter(item => {
-        return item.userName.indexOf(term) > -1
-    })
-  }
   
-  const visibleData = searchEmp(tableContent, searchTerm);
   
   const spinner = isFetching ? <Spinner /> : null;
   const content = isFetching ? null : (
     <TableView
       daysInMonth={daysInMonth}
-      tableContent={visibleData}
+      tableContent={tableContent}
       isFetching={isFetching}
     />
   );
   return (
     <>
-      <SearchBar onUpdateSearch={onUpdateSearch}/>
       {spinner}
       {content}
     </>

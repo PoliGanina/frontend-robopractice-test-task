@@ -9,19 +9,14 @@ export const getUsersTableData = (data) =>
         const startDate = parse(info.Start, "HH-mm", new Date());
         const endDate = parse(info.End, "HH-mm", new Date());
         const differenceMinutes = differenceInMinutes(endDate, startDate);
-        const screenTimeDaily = getFormatedTime(differenceMinutes);
         const dayOfMonth = new Date(info.Date).getDate();
 
-        return { date: dayOfMonth, differenceMinutes, screenTimeDaily };
+        return { date: dayOfMonth, differenceMinutes };
       }),
     };
   });
 
-const getFormatedTime = (differenceMinutes) => {
-  const durationHours = Math.floor(differenceMinutes / 60);
-  const durationMinutes = differenceMinutes % 60;
-  return `${durationHours}:${durationMinutes}`;
-};
+
 
 export const getDataWithAvailiability = (tableData, daysInMonth) =>
   tableData.map(({ days, ...rest }) => {
@@ -31,13 +26,13 @@ export const getDataWithAvailiability = (tableData, daysInMonth) =>
     );
     const arrScreenTime = daysInMonth.map((day) => {
       const relevantDay = days.find((item) => item.date === day);
-      return relevantDay ? relevantDay.screenTimeDaily : 0;
+      return relevantDay ? relevantDay.differenceMinutes: 0;
     });
 
     return {
       days: arrScreenTime,
       ...rest,
-      totalScreenTime: getFormatedTime(totalScreenTime),
+      totalScreenTime: totalScreenTime,
     };
   });
 

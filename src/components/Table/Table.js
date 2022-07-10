@@ -1,20 +1,85 @@
-import { useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableFooter from "@mui/material/TableFooter";
-import TablePagination from "@mui/material/TablePagination";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import {TablePaginationActions} from "./Table.utils";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableFooter,
+  TablePagination,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import {
+  TablePaginationActions,
+  getFormatedTime,
+  EnhancedTableHead,
+} from "./Table.utils";
 
+import "./table.css";
+import { Typography } from "@mui/material";
+import SearchBar from "../SearchBar/SearchBar";
 
 const TableView = ({ daysInMonth, tableContent }) => {
-    
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [prevContent, setPrevCont] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("userName");
+
+  const onUpdateSearch = (searchTerm) => setSearchTerm(searchTerm);
+
+  const searchEmp = (items, term) => {
+    if (term.length === 0) {
+      return tableContent;
+    }
+    return items.filter((item) => {
+      return item.userName.indexOf(term) > -1;
+    });
+  };
+
+  // const visibleData = searchEmp(tableContent, searchTerm);
+
+  const handleSort = (orderByProp) => {
+    const isAsc = orderBy === orderByProp && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(orderByProp);
+  };
+
+  const visibleData = useMemo(() => {
+    const filteredData = searchEmp(tableContent, searchTerm);
+
+    return filteredData.sort((a, b) => {
+      if (order === "asc") {
+        switch (orderBy) {
+          case "userName":
+            return a[orderBy].toLowerCase() > b[orderBy].toLowerCase() ? 1 : -1;
+          case "totalScreenTime":
+            return a[orderBy] > b[orderBy] ? 1 : -1;
+          default:
+            return a.days[orderBy] > b.days[orderBy] ? 1 : -1;
+        }
+      }
+
+      switch (orderBy) {
+        case "userName":
+          return a[orderBy].toLowerCase() > b[orderBy].toLowerCase() ? -1 : 1;
+        case "totalScreenTime":
+          return a[orderBy] > b[orderBy] ? -1 : 1;
+        default:
+          return a.days[orderBy] > b.days[orderBy] ? -1 : 1;
+      }
+    });
+  }, [tableContent, searchTerm, order, orderBy]);
+
+  useEffect(() => {
+    if (visibleData.length !== prevContent.length) {
+      setPrevCont(visibleData);
+      setPage(0);
+    }
+  }, [visibleData]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -31,39 +96,44 @@ const TableView = ({ daysInMonth, tableContent }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="table">
-        <TableHead>
-          <TableRow>
-            <TableCell>UserName</TableCell>
-            {daysInMonth.map((day, i) => {
-              return (
-                <TableCell align="center" key={i}>
-                  {day}
-                </TableCell>
-              );
-            })}
-            <TableCell>TOTAL (hh:mm)</TableCell>
-          </TableRow>
-        </TableHead>
+      <div className="table__toolbar">
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+          className="table__title"
+        >
+          Employee Time Tracking
+        </Typography>
+        <SearchBar onUpdateSearch={onUpdateSearch} />
+      </div>
+      <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label="table">
+        <EnhancedTableHead
+          order={order}
+          orderBy={orderBy}
+          onRequestSort={handleSort}
+          daysInMonth={daysInMonth}
+        />
         <TableBody>
           {(rowsPerPage > 0
-            ? tableContent.slice(
+            ? visibleData.slice(
                 page * rowsPerPage,
                 page * rowsPerPage + rowsPerPage
               )
-            : tableContent
+            : visibleData
           ).map((userData) => (
-            <TableRow key={userData.id} style={{ height: 50 }}>
-              <TableCell component="th" scope="row" className='resizable'>
+            <TableRow key={userData.id}>
+              <TableCell component="th" scope="row" className="resizable">
                 {userData.userName}
               </TableCell>
               {userData.days.map((day, i) => (
                 <TableCell align="center" key={`${userData.id}-${i}`}>
-                  {userData.days[i]}
+                  {getFormatedTime(userData.days[i])}
                 </TableCell>
               ))}
               <TableCell component="th" scope="row">
-                {userData.totalScreenTime}
+                {getFormatedTime(userData.totalScreenTime)}
               </TableCell>
             </TableRow>
           ))}
@@ -75,25 +145,25 @@ const TableView = ({ daysInMonth, tableContent }) => {
         </TableBody>
       </Table>
       <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[8, 16, 32, { label: "All", value: -1 }]}
-              colSpan={3}
-              count={tableContent.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: {
-                  "aria-label": "rows per page",
-                },
-                native: true,
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
+        <TableRow>
+          <TablePagination
+            rowsPerPageOptions={[8, 16, 32, { label: "All", value: -1 }]}
+            colSpan={3}
+            count={tableContent.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            SelectProps={{
+              inputProps: {
+                "aria-label": "rows per page",
+              },
+              native: true,
+            }}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            ActionsComponent={TablePaginationActions}
+          />
+        </TableRow>
+      </TableFooter>
     </TableContainer>
   );
 };
