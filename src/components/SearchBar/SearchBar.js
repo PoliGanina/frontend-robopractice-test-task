@@ -14,7 +14,7 @@ const SearchBar = ({onUpdateSearch}) => {
     <input
       type="text"
       className="search__bar"
-      placeholder="Start typing the employee name..."
+      placeholder="Search"
       value={searchTerm}
       onChange={onUpdateSearchLocal}
     />

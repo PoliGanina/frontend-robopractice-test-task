@@ -2,13 +2,11 @@ import { useMemo } from "react";
 import { useGetData } from "../../services/ServerRequest";
 import TableView from "../Table/Table";
 import Spinner from "../Spinner/Spinner";
-import { useState } from "react";
 import {
   getAllDaysInMonth,
   getDataWithAvailiability,
   getUsersTableData,
 } from "./users.utils";
-import SearchBar from "../SearchBar/SearchBar";
 
 const UsersList = () => {
 

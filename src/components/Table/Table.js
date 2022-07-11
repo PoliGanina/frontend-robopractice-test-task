@@ -6,15 +6,11 @@ import {
   TableContainer,
   TableFooter,
   TablePagination,
-  TableHead,
   TableRow,
   Paper,
 } from "@mui/material";
-import {
-  TablePaginationActions,
-  getFormatedTime,
-  EnhancedTableHead,
-} from "./Table.utils";
+import TablePaginationActions from './TablePaginationActions';
+import TableHeadEnhanced from './TableHeadEnhanced';
 
 import "./table.css";
 import { Typography } from "@mui/material";
@@ -29,6 +25,12 @@ const TableView = ({ daysInMonth, tableContent }) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("userName");
 
+  const getFormatedTime = (differenceMinutes) => {
+    const durationHours = Math.floor(differenceMinutes / 60);
+    const durationMinutes = differenceMinutes % 60;
+    return `${durationHours}:${durationMinutes}`;
+  };
+
   const onUpdateSearch = (searchTerm) => setSearchTerm(searchTerm);
 
   const searchEmp = (items, term) => {
@@ -39,8 +41,6 @@ const TableView = ({ daysInMonth, tableContent }) => {
       return item.userName.indexOf(term) > -1;
     });
   };
-
-  // const visibleData = searchEmp(tableContent, searchTerm);
 
   const handleSort = (orderByProp) => {
     const isAsc = orderBy === orderByProp && order === "asc";
@@ -95,76 +95,82 @@ const TableView = ({ daysInMonth, tableContent }) => {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <div className="table__toolbar">
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-          className="table__title"
-        >
-          Employee Time Tracking
-        </Typography>
-        <SearchBar onUpdateSearch={onUpdateSearch} />
-      </div>
-      <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label="table">
-        <EnhancedTableHead
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleSort}
-          daysInMonth={daysInMonth}
-        />
-        <TableBody>
-          {(rowsPerPage > 0
-            ? visibleData.slice(
-                page * rowsPerPage,
-                page * rowsPerPage + rowsPerPage
-              )
-            : visibleData
-          ).map((userData) => (
-            <TableRow key={userData.id}>
-              <TableCell component="th" scope="row" className="resizable">
-                {userData.userName}
-              </TableCell>
-              {userData.days.map((day, i) => (
-                <TableCell align="center" key={`${userData.id}-${i}`}>
-                  {getFormatedTime(userData.days[i])}
-                </TableCell>
-              ))}
-              <TableCell component="th" scope="row">
-                {getFormatedTime(userData.totalScreenTime)}
-              </TableCell>
-            </TableRow>
-          ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <TableFooter>
-        <TableRow>
-          <TablePagination
-            rowsPerPageOptions={[8, 16, 32, { label: "All", value: -1 }]}
-            colSpan={3}
-            count={tableContent.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            SelectProps={{
-              inputProps: {
-                "aria-label": "rows per page",
-              },
-              native: true,
-            }}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            ActionsComponent={TablePaginationActions}
+    <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <TableContainer>
+        <div className="table__toolbar">
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+            className="table__title"
+          >
+            Employee Time Tracking
+          </Typography>
+          <SearchBar onUpdateSearch={onUpdateSearch} />
+        </div>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHeadEnhanced
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleSort}
+            daysInMonth={daysInMonth}
           />
-        </TableRow>
-      </TableFooter>
-    </TableContainer>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? visibleData.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )
+              : visibleData
+            ).map((userData) => (
+              <TableRow key={userData.id}>
+                <TableCell component="th" scope="row">
+                  {userData.userName}
+                </TableCell>
+                {userData.days.map((day, i) => (
+                  <TableCell
+                    align="center"
+                    key={`${userData.id}-${i}`}
+                    padding="normal"
+                  >
+                    {getFormatedTime(userData.days[i])}
+                  </TableCell>
+                ))}
+                <TableCell component="th" scope="row">
+                  {getFormatedTime(userData.totalScreenTime)}
+                </TableCell>
+              </TableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[8, 16, 32, { label: "All", value: -1 }]}
+              colSpan={3}
+              count={tableContent.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              SelectProps={{
+                inputProps: {
+                  "aria-label": "rows per page",
+                },
+                native: true,
+              }}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter>
+      </TableContainer>
+    </Paper>
   );
 };
 
